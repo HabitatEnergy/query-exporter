@@ -18,8 +18,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-          - name: Build and Publish Docker Image
-          run: |
-            docker build -t ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }} .
-            docker push ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }}
+      - name: Build and Publish Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }} .
+          docker push ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }}
   
