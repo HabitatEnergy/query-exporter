@@ -20,6 +20,7 @@ jobs:
 
       - name: Build and Publish Docker Image
         run: |
-          docker build -t ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }} .
-          docker push ghcr.io/${{ github.repository | lowercase }}:${{ github.sha }}
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/${{ REPO_NAME }} }}:${{ github.sha }} .
+          docker push ghcr.io/${{ REPO_NAME }}:${{ github.sha }}
   
