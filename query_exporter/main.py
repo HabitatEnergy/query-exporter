@@ -40,7 +40,7 @@ class QueryExporterScript(PrometheusExporterScript):
             version=f"%(prog)s {__version__}",
         )
         parser.add_argument(
-            "--port",
+            "--exporter-port",
             type=int,
             default=self.default_port,
             help="set default_port",
