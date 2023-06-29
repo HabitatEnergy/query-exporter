@@ -13,6 +13,7 @@ RUN apt-get install -y --no-install-recommends \
 COPY . /srcdir
 RUN python3 -m venv /virtualenv
 ENV PATH="/virtualenv/bin:$PATH"
+RUN apt install -y pkg-config
 RUN pip install \
     /srcdir \
     cx-Oracle \
@@ -20,7 +21,7 @@ RUN pip install \
     mysqlclient \
     psycopg2 \
     pymssql \
-    pyodbc
+    pyodbc 
 
 RUN curl \
     https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip \
@@ -41,14 +42,32 @@ RUN apt-get update && \
     libmariadb-dev-compat \
     libodbc1 \
     libpq5 \
-    libxml2 && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg && \
-    (. /etc/os-release; echo "deb https://packages.microsoft.com/debian/$VERSION_ID/prod $VERSION_CODENAME main") > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql17 && \
-    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man && \
+    libxml2 \
+    pkg-config 
+
+
+#RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+#    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+#    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg && \
+#    (. /etc/os-release; echo "deb https://packages.microsoft.com/debian/$VERSION_ID/prod $VERSION_CODENAME main") > /etc/apt/sources.list.d/mssql-release.list 
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+
+RUN curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update
+RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
+# optional: for bcp and sqlcmd
+RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18
+# echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+# source ~/.bashrc
+# optional: for unixODBC development headers
+RUN apt-get install -y unixodbc-dev 
+
+RUN apt-get update
+
+# RUN ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql17 
+
+RUN rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man && \
     apt-get clean
 
 COPY --from=build-image /virtualenv /virtualenv
